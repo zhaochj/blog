@@ -66,6 +66,7 @@ def reg(ctx, request: MagWeb.Request) -> MagWeb.Response:
 @user_router.post('/login')
 def login(ctx, request: MagWeb.Request) -> MagWeb.Response:
     payload = request.json
+    print(payload)
 
     # 先检查登陆用户是否正确
     email = payload['email']
@@ -89,22 +90,23 @@ def login(ctx, request: MagWeb.Request) -> MagWeb.Response:
 def authenticate(fn):
     def wrapper(ctx, request: MagWeb.Request):
         try:
-            jwt_str = request.headers.get('Jwt')  # token通过header传递，与业务数据分离
+            jwt_str = request.headers.get('jwt')  # token通过header传递，与业务数据分离
             payload = jwt.decode(jwt_str, key=config.AUTH_SECRET, algorithms=['HS256'])
 
             # 判断是否过期
-            if (datetime.datetime.now() - payload.get('timestamp', 0)) > config.AUTH_EXPIRE:
+            if (datetime.datetime.now().timestamp() - payload.get('timestamp', 0)) > config.AUTH_EXPIRE:
                 raise exc.HTTPUnauthorized()
 
             # 判断用户是否存在
-            user = session.query(User).filter(User.id == payload.get('user_id', -1)).first()
+            user_id = payload.get('user_id', -1)
+            user = session.query(User).filter(User.id == user_id).first()
             # payload.get('user_id', -1) payload中没有user_id那直接给-1，使数据库查询能进行
             if user is None:
                 raise exc.HTTPUnauthorized()
             request.user = user  # 动态绑定一个属性
         except Exception as e:
             raise exc.HTTPUnauthorized()
-        return fn(ctx, request)
+        return fn(ctx, request)  # 不能放到try中，否则内层的异常会被改成了HTTPUnauthorized
     return wrapper
 
 

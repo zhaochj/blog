@@ -18,7 +18,7 @@ class User(Base):
     password = Column(String(128), nullable=False)
 
     def __repr__(self):
-        return '<User (id={}, name={}, email={}})>'.format(self.id, self.name, self.email)
+        return '<User (id={}, name={}, email={})>'.format(self.id, self.name, self.email)
 
 
 class Post(Base):

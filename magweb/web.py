@@ -152,7 +152,7 @@ class _Router:
 
     def matcher(self, request: webob.Request) -> webob.Response:
         if not request.path.startswith(self.__prefix):  # path的前缀不匹配直接返回None
-            return
+            return None
 
         # 拦截请求
         for fn in self.pre_interceptor:
@@ -160,7 +160,7 @@ class _Router:
 
         # 在保证前缀后，做正则匹配
         for pattern, name_type, methods, handler in self.__router_table:
-            if not methods or request.method.upper() in methods:
+            if not methods or request.method.upper() in methods:  # not methods表示一个方法都没有定义，则支持全部方法
                 matcher = pattern.match(request.path.replace(self.__prefix, '', 1))  # 去掉前缀后进行match
                 if matcher:
                     # 在request对象上绑定分组信息
@@ -172,8 +172,8 @@ class _Router:
                         new_dict[k] = name_type[k](v)  # 进行类型转换
                     request.vars = Dict2Obj(new_dict)  # 字典属性化后动态绑定到request对象，最后传递到相应的handler
                     # print(new_dict)
-
                     response = handler(self.ctx, request)  # 增加上下文参数，并回传request，相应的handler就可以拿到分组信息
+
                     # 拦截响应
                     for fn in self.post_interceptor:
                         response = fn(self.ctx, request, response)
