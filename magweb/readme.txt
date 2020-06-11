@@ -7,9 +7,6 @@ import json
 idx = MagWeb.Router()
 py = MagWeb.Router('/python')
 
-# 路由对象在app中注册
-MagWeb.register(idx)
-MagWeb.register(py)
 
 # @idx.route('^/$', 'GET')   # index = idx.route('^/$', 'GET')(index)
 @idx.get('^/$')
@@ -33,6 +30,9 @@ def python(ctx: MagWeb.Context, request: MagWeb.Request) -> MagWeb.Response:
     res.body = html.encode()
     return res
 
+# 路由对象在app中注册
+MagWeb.register(idx)
+MagWeb.register(py)
 
 # 拦截器
 @MagWeb.pre_interceptor_reg
