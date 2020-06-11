@@ -11,6 +11,7 @@ import bcrypt
 from ..util import jsonify
 import jwt
 from .. import config
+import datetime
 
 # 用户相关的路由类实例化，后边需要在app.py中注册
 user_router = MagWeb.Router(prefix='/user')
@@ -18,7 +19,8 @@ user_router = MagWeb.Router(prefix='/user')
 
 # 生成token
 def gen_token(user_id):
-    return jwt.encode({'user_id': user_id}, key=config.AUTH_SECRET, algorithm='HS256').decode()
+    return jwt.encode({'user_id': user_id, 'timestamp': int(datetime.datetime.now().timestamp())},
+                      key=config.AUTH_SECRET, algorithm='HS256').decode()
 
 
 # 用户注册绑定请求方法与url
@@ -63,4 +65,50 @@ def reg(ctx, request: MagWeb.Request) -> MagWeb.Response:
 # 用户登陆绑定请求方法与url
 @user_router.post('/login')
 def login(ctx, request: MagWeb.Request) -> MagWeb.Response:
-    print(request)
+    payload = request.json
+
+    # 先检查登陆用户是否正确
+    email = payload['email']
+    user = session.query(User).filter(User.email == email).first()
+    password_check = bcrypt.checkpw(payload['password'].encode(), user.password.encode())
+    if user and password_check:  # 登陆用户与密码较验都通过时
+        return jsonify(
+            user={
+                'id': user.id,
+                'name': user.name,
+                'email': user.email
+            },
+            tokeen=gen_token(user.id)
+        )
+    else:
+        raise exc.HTTPUnauthorized()
+
+
+# 用户是否已登陆状态的认证,判断条件： 1. jwt token中时间不过期 2. 数据库中能查出此用户
+# 此装饰器由拦截器改造来
+def authenticate(fn):
+    def wrapper(ctx, request: MagWeb.Request):
+        try:
+            jwt_str = request.headers.get('Jwt')  # token通过header传递，与业务数据分离
+            payload = jwt.decode(jwt_str, key=config.AUTH_SECRET, algorithms=['HS256'])
+
+            # 判断是否过期
+            if (datetime.datetime.now() - payload.get('timestamp', 0)) > config.AUTH_EXPIRE:
+                raise exc.HTTPUnauthorized()
+
+            # 判断用户是否存在
+            user = session.query(User).filter(User.id == payload.get('user_id', -1)).first()
+            # payload.get('user_id', -1) payload中没有user_id那直接给-1，使数据库查询能进行
+            if user is None:
+                raise exc.HTTPUnauthorized()
+            request.user = user  # 动态绑定一个属性
+        except Exception as e:
+            raise exc.HTTPUnauthorized()
+        return fn(ctx, request)
+    return wrapper
+
+
+
+
+
+
