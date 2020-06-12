@@ -75,7 +75,7 @@ def article_list(ctx, request: MagWeb.Request):
     # except:
     #     page = 1
 
-    page = validate(request.params, 'page', 1, int, lambda x, y: x if x > 0 else y)
+    page = validate(request.params, 'page', 1, int, lambda x, y: x if x > 0 else y)  # 对page和size值的获取，在逻辑上发现有些相似，所以可以抽象成一个函数来操作
 
     # 每页显示多少条数据，这个值可以在浏览器端提供给用户选择，但要做好范围的控制，也可不提供
     # try:
