@@ -75,7 +75,7 @@ def article_list(ctx, request: MagWeb.Request):
     # except:
     #     page = 1
 
-    page = validate(request.params, 'page', int, 1, lambda x, y: x if x > 0 else y)
+    page = validate(request.params, 'page', 1, int, lambda x, y: x if x > 0 else y)
 
     # 每页显示多少条数据，这个值可以在浏览器端提供给用户选择，但要做好范围的控制，也可不提供
     # try:
@@ -84,12 +84,12 @@ def article_list(ctx, request: MagWeb.Request):
     # except:
     #     size = 20
 
-    size = validate(request.params, 'size', int, 10, lambda x, y: x if 0 < x < 101 else y)
+    size = validate(request.params, 'size', 10, int, lambda x, y: x if 0 < x < 101 else y)
 
     try:
         # 数据为操作，获取数据，返回
         posts = session.query(Post).order_by(Post.id.desc()).limit(size).offset(size * (page - 1)).all()
-        return jsonify(posts=[{'post_id': post.id, 'title': post.title, 'postdate': post.postdate} for post in posts])
+        return jsonify(posts=[{'post_id': post.id, 'title': post.title, 'postdate': post.postdate.timestamp()} for post in posts])
     except Exception as e:
         print(e)
         raise exc.HTTPInternalServerError()

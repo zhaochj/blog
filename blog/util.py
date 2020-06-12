@@ -20,8 +20,8 @@ def validate(d: dict, name: str, default, converter_func, validate_fun):
     try:
         result = converter_func(d.get(name, default))
         result = validate_fun(result, default)
-        return result
     except:
-        return default
+        result = default
+    return result
 
 
