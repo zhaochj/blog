@@ -4,6 +4,7 @@ from ..model import session, Post, Content
 from webob import exc
 from ..util import jsonify, validate
 import datetime
+import math
 
 
 # 与文章的路由
@@ -88,8 +89,15 @@ def article_list(ctx, request: MagWeb.Request):
 
     try:
         # 数据为操作，获取数据，返回
-        posts = session.query(Post).order_by(Post.id.desc()).limit(size).offset(size * (page - 1)).all()
-        return jsonify(posts=[{'post_id': post.id, 'title': post.title, 'postdate': post.postdate.timestamp()} for post in posts])
+        query = session.query(Post)
+        count = query.count()  # 数据总数
+        posts = query.order_by(Post.id.desc()).limit(size).offset(size * (page - 1)).all()
+        return jsonify(posts=[{'post_id': post.id, 'title': post.title, 'postdate': post.postdate.timestamp()} for post in posts], pagination={
+            'page': page,   # 第几页
+            'size': size,   # 本页显示的数据条数
+            'count': count,  # 所有数据的总条数
+            'page_count': math.ceil(count/size)  # 页总数，向上取整
+        })
     except Exception as e:
         print(e)
         raise exc.HTTPInternalServerError()
