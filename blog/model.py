@@ -59,6 +59,8 @@ class Dig(Base):
     state = Column(TINYINT, default=0, nullable=False)
     pubdate = Column(DateTime, nullable=False)
 
+    user = relationship('User')
+
     # __table_args__ 是为字段增加一些复杂的约束，UniqueConstraint 表示是唯一键约束，这里用了联合唯一键，__table_args__参数是一个元组
     # 文档：https://docs.sqlalchemy.org/en/13/core/constraints.html#unique-constraint
     __table_args__ = (
