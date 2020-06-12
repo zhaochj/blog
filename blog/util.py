@@ -15,4 +15,13 @@ def jsonify(status=200, **kwargs):
     return res
 
 
+# 文章列表显示时对页面数据进行较验证函数
+def validate(d: dict, name: str, default, converter_func, validate_fun):
+    try:
+        result = converter_func(d.get(name, default))
+        result = validate_fun(result, default)
+        return result
+    except:
+        return default
+
 

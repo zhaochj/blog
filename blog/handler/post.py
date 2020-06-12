@@ -2,7 +2,7 @@ from magweb import MagWeb
 from .user import authenticate
 from ..model import session, Post, Content
 from webob import exc
-from ..util import jsonify
+from ..util import jsonify, validate
 import datetime
 
 
@@ -12,7 +12,7 @@ post_router = MagWeb.Router(prefix='/post')
 
 # 文章发布接口 /post/
 
-@post_router.post('/')   # pub = post_router.post('/')(pub)
+@post_router.post('/')  # pub = post_router.post('/')(pub)
 @authenticate  # 验证
 def pub(ctx, request: MagWeb.Request):
     # 用户要发布文章： 1. 需要登陆，需要验证用户， 2. 需要title, content
@@ -55,7 +55,8 @@ def get(ctx, request: MagWeb.Request) -> MagWeb.Response:
             'title': post.title,
             'author': post.author.name,
             'author_id': post.author_id,
-            'postdate': post.postdate.timestamp(),  # 需要转换为timestamp，否则报Object of type 'datetime' is not JSON serializable
+            'postdate': post.postdate.timestamp(),
+            # 需要转换为timestamp，否则报Object of type 'datetime' is not JSON serializable
             'content': post.content.content
         })
     except Exception as e:
@@ -68,18 +69,22 @@ def get(ctx, request: MagWeb.Request) -> MagWeb.Response:
 def article_list(ctx, request: MagWeb.Request):
     # http://url/post?page=2
     # page值获取
-    try:
-        page = int(request.params.get('page', 1))  # 从request中获取params，无法获取就默认是第一页
-        page = page if page > 0 else 1
-    except:
-        page = 1
+    # try:
+    #     page = int(request.params.get('page', 1))  # 从request中获取params，无法获取就默认是第一页
+    #     page = page if page > 0 else 1
+    # except:
+    #     page = 1
+
+    page = validate(request.params, 'page', int, 1, lambda x, y: x if x > 0 else y)
 
     # 每页显示多少条数据，这个值可以在浏览器端提供给用户选择，但要做好范围的控制，也可不提供
-    try:
-        size = int(request.params.get('size', 10))
-        size = size if 0 < size < 101 else 20
-    except:
-        size = 20
+    # try:
+    #     size = int(request.params.get('size', 10))
+    #     size = size if 0 < size < 101 else 20
+    # except:
+    #     size = 20
+
+    size = validate(request.params, 'size', int, 10, lambda x, y: x if 0 < x < 101 else y)
 
     try:
         # 数据为操作，获取数据，返回
@@ -88,12 +93,3 @@ def article_list(ctx, request: MagWeb.Request):
     except Exception as e:
         print(e)
         raise exc.HTTPInternalServerError()
-
-
-
-
-
-
-
-
-
