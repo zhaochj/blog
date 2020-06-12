@@ -166,6 +166,7 @@ class _Router:
         for pattern, name_type, methods, handler in self.__router_table:
             if not methods or request.method.upper() in methods:  # not methods表示一个方法都没有定义，则支持全部方法
                 matcher = pattern.match(request.path.replace(self.__prefix, '', 1))  # 去掉前缀后进行match
+                # print(matcher)
                 if matcher:
                     # 在request对象上绑定分组信息
                     # request.args = matcher.groups()
@@ -175,7 +176,7 @@ class _Router:
                     for k, v in matcher.groupdict().items():
                         new_dict[k] = name_type[k](v)  # 进行类型转换
                     request.vars = Dict2Obj(new_dict)  # 字典属性化后动态绑定到request对象，最后传递到相应的handler
-                    # print(new_dict)
+                    # print(2222, new_dict)
                     response = handler(self.ctx, request)  # 增加上下文参数，并回传request，相应的handler就可以拿到分组信息
 
                     # 拦截响应
@@ -242,7 +243,8 @@ class MagWeb:
             # print(self.POST_INTERCEPTOR)
             if response:  # 返回None或response对象
                 return response
-        raise HTTPNotFound('你访问的页面不存在！')
+
+        raise HTTPNotFound('NOT FOUNT!')
 
 
 # 数据json化函数
