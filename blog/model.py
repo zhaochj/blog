@@ -28,6 +28,7 @@ class Post(Base):
     title = Column(String(128), nullable=True)
     author_id = Column(Integer, ForeignKey('user.id'), nullable=False, comment='作者id，是user.id的外键')
     postdate = Column(DateTime, nullable=False)
+    hits = Column(Integer, default=0, nullable=False, index=True)
 
     author = relationship('User')   # 写类名称的字符串
     content = relationship('Content', uselist=False)  # 一对一设置为False，表示在post这个表中如果想查询信息，一个文章id只能对应一个文章的内容，反之也是，所以这种关系使用False
