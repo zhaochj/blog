@@ -47,3 +47,20 @@ http://127.0.0.1:9000/post/文章id号
 GET
 ```
 
+- 赞文章接口
+
+```
+http://127.0.0.1:9000/post/dig/3   --最后的3是post.id
+PUT方法
+加上jwt的token
+```
+
+- 踩文章接口
+
+```
+http://127.0.0.1:9000/burry/dig/3   --最后的3是post.id
+PUT方法
+加上jwt的token
+```
+
+
