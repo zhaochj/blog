@@ -146,6 +146,10 @@ class _Router:
         # POST方法装饰器
         return self.route(pattern, 'POST')
 
+    def put(self, pattern):
+        # PUT方法装饰器
+        return self.route(pattern, 'PUT')
+
     def head(self, pattern):
         # HEAD方法装饰器
         return self.route(pattern, 'HEAD')
