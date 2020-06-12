@@ -32,8 +32,10 @@ def reg(ctx, request: MagWeb.Request) -> MagWeb.Response:
     #     "name": "tom",
     #     "email": "tom@magedu.com"
     # }
-
-    payload = request.json
+    try:
+        payload = request.json
+    except Exception as e:
+        raise exc.HTTPBadRequest('数据解析出错')
     # 验证邮箱是否唯一
     email = payload.get('email')
     if session.query(User).filter(User.email == email).first() is not None:  # 在表中找到了email

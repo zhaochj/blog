@@ -16,8 +16,10 @@ post_router = MagWeb.Router(prefix='/post')
 @authenticate  # 验证
 def pub(ctx, request: MagWeb.Request):
     # 用户要发布文章： 1. 需要登陆，需要验证用户， 2. 需要title, content
-    payload = request.json
-
+    try:
+        payload = request.json
+    except Exception as e:
+        raise exc.HTTPBadRequest('数据解析出错')
     post = Post()
     try:
         post.title = payload.get('title')
