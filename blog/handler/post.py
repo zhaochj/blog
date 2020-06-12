@@ -63,6 +63,35 @@ def get(ctx, request: MagWeb.Request) -> MagWeb.Response:
         raise exc.HTTPNotFound()
 
 
+# 文章列表页显示
+@post_router.get('/')
+def article_list(ctx, request: MagWeb.Request):
+    # http://url/post?page=2
+    # page值获取
+    try:
+        page = int(request.params.get('page', 1))  # 从request中获取params，无法获取就默认是第一页
+        page = page if page > 0 else 1
+    except:
+        page = 1
+
+    # 每页显示多少条数据，这个值可以在浏览器端提供给用户选择，但要做好范围的控制，也可不提供
+    try:
+        size = int(request.params.get('size', 10))
+        size = size if 0 < size < 101 else 20
+    except:
+        size = 20
+
+    try:
+        # 数据为操作，获取数据，返回
+        posts = session.query(Post).order_by(Post.id.desc()).limit(size).offset(size * (page - 1)).all()
+        return jsonify(posts=[{'post_id': post.id, 'title': post.title, 'postdate': post.postdate} for post in posts])
+    except Exception as e:
+        print(e)
+        raise exc.HTTPInternalServerError()
+
+
+
+
 
 
 
