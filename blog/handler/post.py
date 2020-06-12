@@ -1,6 +1,6 @@
 from magweb import MagWeb
 from .user import authenticate
-from ..model import session, Post, Content
+from ..model import session, Post, Content, Dig
 from webob import exc
 from ..util import jsonify, validate
 import datetime
@@ -110,3 +110,35 @@ def article_list(ctx, request: MagWeb.Request):
     except Exception as e:
         print(e)
         raise exc.HTTPInternalServerError()
+
+
+# 赞，踩函数
+def dig_or_bury(state, user_id, post_id):
+    _dig = Dig()
+    _dig.user_id = user_id
+    _dig.post_id = post_id
+    _dig.state = state  # 状态，1表示赞, 0表示踩
+    _dig.pubdate = datetime.datetime.now()
+
+    session.add(_dig)
+    try:
+        session.commit()
+        return jsonify(200)  # 成功返回200即可
+    except:
+        session.rollback()
+        return jsonify(500)  # 赞，踩功能不是必要功能，即使写数据库有问题也不应该raise
+
+
+@post_router.put('/dig/{id:int}')
+@authenticate
+def dig(ctx, request: MagWeb.Request):
+    return dig_or_bury(1, request.user.id, request.vars.id)
+
+
+@post_router.put('/bury/{id:int}')
+@authenticate
+def bury(ctx, request: MagWeb.Request):
+    return dig_or_bury(0, request.user.id, request.vars.id)
+
+
+

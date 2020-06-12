@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey, DateTime
-from sqlalchemy.dialects.mysql import LONGTEXT
+from sqlalchemy.dialects.mysql import LONGTEXT, TINYINT
+from sqlalchemy import create_engine, UniqueConstraint
 from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from . import config
 
@@ -45,6 +45,25 @@ class Content(Base):
 
     def __repr__(self):
         return '<Content (id={}, content={})>'.format(self.id, self.content[:20])
+
+
+class Dig(Base):
+    """
+    赞，踩表
+    """
+    __tablename__ = 'dig'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    post_id = Column(BigInteger, ForeignKey('post.id'), nullable=False)
+    state = Column(TINYINT, default=0, nullable=False)
+    pubdate = Column(DateTime, nullable=False)
+
+    # __table_args__ 是为字段增加一些复杂的约束，UniqueConstraint 表示是唯一键约束，这里用了联合唯一键，__table_args__参数是一个元组
+    # 文档：https://docs.sqlalchemy.org/en/13/core/constraints.html#unique-constraint
+    __table_args__ = (
+        UniqueConstraint('user_id', 'post_id', name='unique_user_id_post_id'),
+    )
 
 
 # 数据为连接
