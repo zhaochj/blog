@@ -51,6 +51,15 @@ def get(ctx, request: MagWeb.Request) -> MagWeb.Response:
     try:
         post = session.query(Post).get(p_id)  # 可以使用下边语句
         # post = session.query(Post).filter(Post.id == p_id).first()
+
+        # 调用此函数点击量加1
+        post.hits += 1
+        session.add(post)
+        try:
+            session.commit()
+        except:
+            session.rollback()
+
         return jsonify(post={
             'post_id': post.id,
             'title': post.title,
