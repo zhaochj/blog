@@ -1,2 +1,1 @@
-from . web import MagWeb
-
+from .web import MagWeb
