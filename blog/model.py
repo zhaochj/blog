@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey, DateTime
 from sqlalchemy.dialects.mysql import LONGTEXT, TINYINT
-from sqlalchemy import create_engine, UniqueConstraint
+from sqlalchemy import create_engine, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from . import config
@@ -66,6 +66,28 @@ class Dig(Base):
     __table_args__ = (
         UniqueConstraint('user_id', 'post_id', name='unique_user_id_post_id'),
     )
+
+
+class Tag(Base):
+    """文章标签实体"""
+    __tablename__ = 'tag'
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    tag = Column(String(16), nullable=False, unique=True)  # 标签不能太长，限制用户输入长度
+
+
+class Post_tag(Base):
+    """文章标签,中间表"""
+    __tablename__ = 'post_tag'
+
+    post_id = Column(BigInteger, ForeignKey('post.id'), nullable=False)
+    tag_id = Column(BigInteger, ForeignKey('tag.id'), nullable=False)
+
+    # 在前端页面，一文章的详情页面显示该文章的内容时会显示文章的标签名称，可能还会根据标签名称查看哪些文章打了这个标签，所以有以下关系
+    tag = relationship('Tag')
+    post = relationship('Post')
+
+    __table_args__ = (PrimaryKeyConstraint('post_id', 'tag_id'),)  # 此表结构简单，可以不用一个自增id做主键，两个字段能表示一个唯一的值，可做联合主键约束
 
 
 # 数据为连接

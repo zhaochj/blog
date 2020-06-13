@@ -25,6 +25,7 @@ POST:
 	"name":"tom2",
 	"email":"tom2@magedu.com"
 }
+返回一个token
 ```
 
 - 文章发布接口
@@ -34,7 +35,8 @@ http://127.0.0.1:9000/post/
 POST:
 {
 	"title":"test title2",
-	"content":"test content2...."
+	"content":"test content2....",
+    "tags":"mysql 主从"
 }
 header中加上 jwt: 值
 ```
@@ -51,6 +53,20 @@ GET
 
 ```
 http://127.0.0.1:9000/post/
+GET
+```
+
+- 以某个用户列表显示文章
+
+```
+http://127.0.0.1:9000/post/u/用户id
+GET
+```
+
+- 以某个标签来列表显示文章
+
+```
+http://127.0.0.1:9000/post/t/标签     路径中传递中文时请不要使用Postman测试，postman在路径中不能传递中文
 GET
 ```
 
