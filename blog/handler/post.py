@@ -117,32 +117,35 @@ def get(ctx, request: MagWeb.Request) -> MagWeb.Response:
         raise exc.HTTPNotFound()
 
 
-# 文章列表页显示
-@post_router.get('/')
+@post_router.get('/')  # 所有文章列表页显示
+@post_router.get('/u/{id:int}')  # 某个用户文章列表显示
+@post_router.get('/t/{tag:str}')  # 按标签来列表显示
 def article_list(ctx, request: MagWeb.Request):
-    # http://url/post?page=2
-    # page值获取
-    # try:
-    #     page = int(request.params.get('page', 1))  # 从request中获取params，无法获取就默认是第一页
-    #     page = page if page > 0 else 1
-    # except:
-    #     page = 1
-
-    page = validate(request.params, 'page', 1, int,
-                    lambda x, y: x if x > 0 else y)  # 对page和size值的获取，在逻辑上发现有些相似，所以可以抽象成一个函数来操作
-
+    # 对page和size值的获取，在逻辑上发现有些相似，所以可以抽象成一个函数来操作
+    page = validate(request.params, 'page', 1, int, lambda x, y: x if x > 0 else y)
     # 每页显示多少条数据，这个值可以在浏览器端提供给用户选择，但要做好范围的控制，也可不提供
-    # try:
-    #     size = int(request.params.get('size', 10))
-    #     size = size if 0 < size < 101 else 20
-    # except:
-    #     size = 20
-
     size = validate(request.params, 'size', 10, int, lambda x, y: x if 0 < x < 101 else y)
 
+    # 按某个用户文章列表显示处理
+    # request.vars.id  这个值是我们的web框架绑定的属性，不是字典，用户未按要求传递，此值可能获取不到
+    query = session.query(Post)
     try:
-        # 数据为操作，获取数据，返回
-        query = session.query(Post)
+        user_id = validate({'id': request.vars.id}, 'id', -1, int, lambda x, y: x if x > 0 else y)
+    except:
+        user_id = -1  # 获取id出错就给个 -1 ，因此值在数据库中一定不存在
+    if user_id > 0:  # 如果有合法的user_id，则增加过滤条件
+        query = query.filter(Post.author_id == user_id)
+
+    # 按标签来列表显示
+    try:
+        tag_name = validate({'tag': request.vars.tag}, 'tag', '', str, lambda x, y: x if len(x) else y)
+    except:
+        tag_name = ''
+    if tag_name:
+        query = query.join(Post_tag, Post.id == Post_tag.post_id).join(Tag, Post_tag.tag_id == Tag.id).filter(tag_name == Tag.tag)  # 三表联合查询找到标签的名称
+
+    try:
+        # 数据操作，获取数据，返回
         count = query.count()  # 数据总数
         posts = query.order_by(Post.id.desc()).limit(size).offset(size * (page - 1)).all()
         return jsonify(
