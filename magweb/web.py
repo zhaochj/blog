@@ -165,7 +165,7 @@ class _Router:
         # 在保证前缀后，做正则匹配
         for pattern, name_type, methods, handler in self.__router_table:
             if not methods or request.method.upper() in methods:  # not methods表示一个方法都没有定义，则支持全部方法
-                matcher = pattern.match(request.path.replace(self.__prefix, '', 1))  # 去掉前缀后进行match
+                matcher = pattern.match(request.path_info.replace(self.__prefix, '', 1))  # 去掉前缀后进行match
                 # print(matcher)
                 if matcher:
                     # 在request对象上绑定分组信息
