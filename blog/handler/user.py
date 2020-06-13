@@ -73,16 +73,19 @@ def login(ctx, request: MagWeb.Request) -> MagWeb.Response:
     # 先检查登陆用户是否正确
     email = payload['email']
     user = session.query(User).filter(User.email == email).first()
-    password_check = bcrypt.checkpw(payload['password'].encode(), user.password.encode())
-    if user and password_check:  # 登陆用户与密码较验都通过时
-        return jsonify(
-            user={
-                'id': user.id,
-                'name': user.name,
-                'email': user.email
-            },
-            tokeen=gen_token(user.id)
-        )
+    if user:  # 当用户在数据库中存在时才验证密码
+        password_check = bcrypt.checkpw(payload['password'].encode(), user.password.encode())
+        if user and password_check:  # 登陆用户与密码较验都通过时
+            return jsonify(
+                user={
+                    'id': user.id,
+                    'name': user.name,
+                    'email': user.email
+                },
+                tokeen=gen_token(user.id)
+            )
+        else:
+            raise exc.HTTPUnauthorized()
     else:
         raise exc.HTTPUnauthorized()
 
