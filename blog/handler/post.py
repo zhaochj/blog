@@ -96,6 +96,11 @@ def get(ctx, request: MagWeb.Request) -> MagWeb.Response:
         except:
             session.rollback()
 
+        # 处理标签数据，把文章的id在post_tag表中进行查找
+        pts = session.query(Post_tag).filter(Post_tag.post_id == p_id).limit(10).all()  # 进行limit的目的是当文章标签很多时，只显示几个
+        # 需要返回什么数据？标签名称，标签id
+        tags = [[x.tag.id, x.tag.tag] for x in pts]  # 准备一个数组返回，通过表中的relationship获取tag表中的数据
+
         bury_info, dig_info = get_digs(p_id)
 
         return jsonify(post={
@@ -106,7 +111,7 @@ def get(ctx, request: MagWeb.Request) -> MagWeb.Response:
             'postdate': post.postdate.timestamp(),
             # 需要转换为timestamp，否则报Object of type 'datetime' is not JSON serializable
             'content': post.content.content
-        }, diginfo=dig_info, buryinfo=bury_info)
+        }, diginfo=dig_info, buryinfo=bury_info, tags=tags)
     except Exception as e:
         print(e)
         raise exc.HTTPNotFound()
