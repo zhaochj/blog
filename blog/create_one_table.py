@@ -6,6 +6,6 @@ def create_tables(tables=None):
 
 
 # model中有新增实体类，可能通过此函数单独创建表
-create_tables(tables=[Base.metadata.tables['dig']])
+create_tables(tables=[Base.metadata.tables['post_tag']])
 
 
