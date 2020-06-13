@@ -25,6 +25,7 @@ POST:
 	"name":"tom2",
 	"email":"tom2@magedu.com"
 }
+返回一个token
 ```
 
 - 文章发布接口
@@ -34,7 +35,8 @@ http://127.0.0.1:9000/post/
 POST:
 {
 	"title":"test title2",
-	"content":"test content2...."
+	"content":"test content2....",
+    "tags":“标签1 标签2”
 }
 header中加上 jwt: 值
 ```
