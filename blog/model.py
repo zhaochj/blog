@@ -73,11 +73,11 @@ class Tag(Base):
     __tablename__ = 'tag'
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    tag = Column(String(16), nullable=False, unique=True)
+    tag = Column(String(16), nullable=False, unique=True)  # 标签不能太长，限制用户输入长度
 
 
 class Post_tag(Base):
-    """文章标签"""
+    """文章标签,中间表"""
     __tablename__ = 'post_tag'
 
     post_id = Column(BigInteger, ForeignKey('post.id'), nullable=False)

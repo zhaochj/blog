@@ -1,17 +1,17 @@
 from magweb import MagWeb
 from .user import authenticate
-from ..model import session, Post, Content, Dig
+from ..model import session, Post, Content, Dig, Tag, Post_tag
 from webob import exc
 from ..util import jsonify, validate
 import datetime
 import math
+import re
 
 # 与文章的路由
 post_router = MagWeb.Router(prefix='/post')
 
 
 # 文章发布接口 /post/
-
 @post_router.post('/')  # pub = post_router.post('/')(pub)
 @authenticate  # 验证
 def pub(ctx, request: MagWeb.Request):
@@ -30,9 +30,29 @@ def pub(ctx, request: MagWeb.Request):
         _content = Content()
         _content.content = payload['content']
         post.content = _content
+
+        tags = payload.get('tags')  # 获取标签，来源： 标签1\t\n标签2,标签3\n标签4
     except Exception as e:
-        print(2, e)
+        # print(2, e)
         raise exc.HTTPBadRequest()
+
+    # 处理标签，切分标签，组装字段
+    tag_list = re.split(r'[\s,+]', tags)
+    for tag in tag_list:
+        t = session.query(Tag).filter(Tag.tag == tag).first()
+        if not t:  # 标签在数据库中未找到时，需要组装字段，准备写数据库
+            t = Tag()
+            t.tag = tag
+            session.add(t)  # 标签数据准备好
+
+        # 页面上传来标签，先判断这个标签在数据库中是否存在，如果不存在，就准备把标签插入到tag表中，插入后就有标签的id号。如果存在就不做对tag表的处理
+        # 接下来需要操作post_tag这个中间表，不管标签是否存在，现在都有了t这个实例，即一行关于这个标签的数据，post_tag中post_id与tag_id这两个字段分别外键关联了
+        # post表中的id和tag表中id，所以不需要单独为这两个字段赋值，而是应该去找关联表中的相应的值，所以在post_tag中定义了两个relationship关系，通过这个关系就
+        # 可以找到相应的值。所以才有下边的"pt.tag = t"和“pt.post = post”这种写法，这样就可以自动在"t"和"post"这两个实例上去找相应的外键所需要的值。这种写法很独特
+        pt = Post_tag()
+        pt.tag = t   # model中 tag = relationship('Tag') 定义了这个关系。
+        pt.post = post  # model中 post = relationship('Post') 定义了这个关系
+        session.add(pt)
 
     session.add(post)
     try:
