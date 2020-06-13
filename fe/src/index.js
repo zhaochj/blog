@@ -1,45 +1,52 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Link
 } from "react-router-dom";
+import Login from './component/Login'
+import Reg from "./component/Reg";
 
 
 function Home() {
-  return (
-    <div>
-      <h2>Home</h2>
-    </div>
-  );
+    return (
+        <div>
+            <h2>Home</h2>
+        </div>
+    );
 }
 
 function About() {
-  return (
-    <div>
-      <h2>About</h2>
-    </div>
-  );
+    return (
+        <div>
+            <h2>About</h2>
+        </div>
+    );
 }
 
 function App() {
-  return (
-    <Router>
-      <div>
-           <Route exact path="/">
-            <Home />
-          </Route>
-          <Route path="/about">
-            <About />
-          </Route>
-      </div>
-    </Router>
-  );
+    return (
+        <Router>
+            <div>
+                <ul>
+                    <li><Link to="/">主页</Link></li>
+                    <li><Link to="/login">登陆</Link></li>
+                    <li><Link to="/reg">注册</Link></li>
+                    <li><Link to="/about">关于</Link></li>
+                </ul>
+
+                <Route path="/about" component={About}/>
+                <Route path="/login" component={Login}/>
+                <Route path="/reg" component={Reg}/>
+                <Route exact path="/" component={Home}/>
+            </div>
+        </Router>
+    );
 }
 
 ReactDOM.render(
-<App />,
-document.getElementById('root')
+    <App/>,
+    document.getElementById('root')
 );
