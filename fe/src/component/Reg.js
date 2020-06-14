@@ -5,17 +5,14 @@ import '../css/login.css'
 import userService from "../service/user";
 import { observer } from 'mobx-react';
 import {message} from "antd";
+import inject from '../inject';
 
 
-export default class Reg extends React.Component {
-    render() {
-        return <_Reg service={userService}/>;
-        //为了分出service这个层次，在组件层中需要想办法把service中的处理逻辑函数通过props的方式注入到组件中，所以采用这种在组件中再套一层的方式
-    }
-}
+const service = userService;
 
+@inject({service})
 @observer
-class _Reg extends React.Component {
+export default class Reg extends React.Component {
     handleClick(event) {
         event.preventDefault();
 
