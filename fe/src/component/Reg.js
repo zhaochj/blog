@@ -4,6 +4,7 @@ import { Redirect } from 'react-router'
 import '../css/login.css'
 import userService from "../service/user";
 import { observer } from 'mobx-react';
+import {message} from "antd";
 
 
 export default class Reg extends React.Component {
@@ -31,6 +32,12 @@ class _Reg extends React.Component {
         if(this.props.service.succeed) {
             return <Redirect to="/"/>;
         }
+
+        // 有错误信息时，页面友好提示
+        if (this.props.service.errMsg) {
+            message.error(this.props.service.errMsg, 3, () => {this.props.service.errMsg=""});
+        }
+
         return (
             <div className="login-page">
                 <div className="form">

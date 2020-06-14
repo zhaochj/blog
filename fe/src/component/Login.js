@@ -4,6 +4,8 @@ import { Redirect } from 'react-router';
 import '../css/login.css'
 import userService from "../service/user";
 import { observer } from 'mobx-react';
+import {message} from 'antd';
+import 'antd/lib/message/style';
 
 
 export default class Login extends React.Component {
@@ -28,6 +30,11 @@ class _Login extends React.Component {
         // 登陆成功后跳转
         if (this.props["service"].succeed) {
             return <Redirect to="/" />
+        }
+
+        // 有错误信息时，页面友好提示，使用了antd中的message，最后一个参数是当onClose触发时的一个回调函数
+        if (this.props.service.errMsg) {
+            message.error(this.props.service.errMsg, 3, () => {this.props.service.errMsg=""});
         }
 
         return (
