@@ -68,7 +68,7 @@ def reg(ctx, request: MagWeb.Request) -> MagWeb.Response:
 @user_router.post('/login')
 def login(ctx, request: MagWeb.Request) -> MagWeb.Response:
     payload = request.json
-    print(payload)
+    # print(payload)
 
     # 先检查登陆用户是否正确
     email = payload['email']

@@ -8,8 +8,9 @@ import expirePlugin from "store/plugins/expire";
 store.addPlugin(expirePlugin);
 
 
-export default class UserService {
+class UserService {
     @observable succeed = false;  // 可观察对象
+    @observable errMsg = "";
 
     login(email, pwd) {
         //异步调用后端login接口
@@ -27,8 +28,9 @@ export default class UserService {
                 store.set('token', response.data.token, new Date().getTime() + (8 * 3600 * 1000),);  // 过期时间8小时
                 this.succeed = true;  // 改变观察对象数据，注意：如果要用this，则需要把function改写成箭头函数
             })
-            .catch(function (error) {
-                console.log('~~~~~~~~~~~~', error);
+            .catch(error => {
+                // console.log('~~~~~~~~~~~~', error);
+                this.errMsg = '登陆失败，请检查用户名和密码';
             });
     }
 
@@ -42,9 +44,13 @@ export default class UserService {
                 store.set('token', response.data.token, new Date().getTime() + (8 * 3600 * 1000),);
                 this.succeed = true;
             })
-            .catch(function (error) {
-                console.log('==========', error);
+            .catch(error => {
+                // console.log('==========', error);
+                this.errMsg = "注册失败，请稍后重试"
             });
     }
 
 }
+
+const userService = new UserService();
+export default userService

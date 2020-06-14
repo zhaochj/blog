@@ -2,20 +2,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router'
 import '../css/login.css'
-import UserService from "../service/user";
+import userService from "../service/user";
 import { observer } from 'mobx-react';
+import {message} from "antd";
+import inject from '../inject';
 
-const service = new UserService();
 
-export default class Reg extends React.Component {
-    render() {
-        return <_Reg service={service}/>;
-        //为了分出service这个层次，在组件层中需要想办法把service中的处理逻辑函数通过props的方式注入到组件中，所以采用这种在组件中再套一层的方式
-    }
-}
+const service = userService;
 
+@inject({service})
 @observer
-class _Reg extends React.Component {
+export default class Reg extends React.Component {
     handleClick(event) {
         event.preventDefault();
 
@@ -32,6 +29,12 @@ class _Reg extends React.Component {
         if(this.props.service.succeed) {
             return <Redirect to="/"/>;
         }
+
+        // 有错误信息时，页面友好提示
+        if (this.props.service.errMsg) {
+            message.error(this.props.service.errMsg, 3, () => {this.props.service.errMsg=""});
+        }
+
         return (
             <div className="login-page">
                 <div className="form">
