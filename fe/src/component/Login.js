@@ -2,15 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import '../css/login.css'
-import UserService from "../service/user";
+import userService from "../service/user";
 import { observer } from 'mobx-react';
 
 
-const service = new UserService();
-
 export default class Login extends React.Component {
     render() {
-        return <_Login service={service} />;  {/*采用这种方式注入props*/}
+        return <_Login service={userService} />;  {/*采用这种方式注入props*/}
     }
 }
 

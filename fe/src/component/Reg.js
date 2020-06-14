@@ -2,14 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router'
 import '../css/login.css'
-import UserService from "../service/user";
+import userService from "../service/user";
 import { observer } from 'mobx-react';
 
-const service = new UserService();
 
 export default class Reg extends React.Component {
     render() {
-        return <_Reg service={service}/>;
+        return <_Reg service={userService}/>;
         //为了分出service这个层次，在组件层中需要想办法把service中的处理逻辑函数通过props的方式注入到组件中，所以采用这种在组件中再套一层的方式
     }
 }

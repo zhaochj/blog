@@ -8,7 +8,7 @@ import expirePlugin from "store/plugins/expire";
 store.addPlugin(expirePlugin);
 
 
-export default class UserService {
+class UserService {
     @observable succeed = false;  // 可观察对象
 
     login(email, pwd) {
@@ -48,3 +48,6 @@ export default class UserService {
     }
 
 }
+
+const userService = new UserService();
+export default userService
