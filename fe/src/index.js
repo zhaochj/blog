@@ -36,13 +36,13 @@ function App() {
                     <li><Link to="/login">登陆</Link></li>
                     <li><Link to="/reg">注册</Link></li>
                     <li><Link to="/about">关于</Link></li>
-                    <li><Link to="/list">文章列表</Link></li>
+                    <li><Link to="/post">文章列表</Link></li>
                 </ul>
 
                 <Route path="/about" component={About}/>
                 <Route path="/login" component={Login}/>
                 <Route path="/reg" component={Reg}/>
-                <Route path="/list" component={ArticleList}/>
+                <Route exact path="/post" component={ArticleList}/>
                 <Route exact path="/" component={Home}/>
             </div>
         </Router>

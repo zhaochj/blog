@@ -9,8 +9,8 @@ class PostService {
     @observable pagination = {page: 1, size: 20, count: 0, page_count: 0};  // 分页信息
     @observable errMsg = "";
 
-    list(page = 1, size = 10) {
-        axios.get('/api/post/')
+    list(page=1, size=10) {
+        axios.get('/api/post/' + '?page=' + page + '&size=' + size)
             .then(response => {
                 console.log(response);
                 this.posts = response.data.posts;
