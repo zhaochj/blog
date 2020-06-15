@@ -1,6 +1,5 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import {Redirect} from 'react-router'
 import postService from "../service/post";
 import {observer} from 'mobx-react';
 import {message} from "antd";

@@ -34,15 +34,6 @@ function App() {
     return (
         <Router>
             <div>
-                {/*<ul>*/}
-                {/*    <li><Link to="/">主页</Link></li>*/}
-                {/*    <li><Link to="/login">登陆</Link></li>*/}
-                {/*    <li><Link to="/reg">注册</Link></li>*/}
-                {/*    <li><Link to="/about">关于</Link></li>*/}
-                {/*    <li><Link to="/post">文章列表</Link></li>*/}
-                {/*</ul>*/}
-
-
                 <Menu mode="horizontal">
                     <Menu.Item key="home">
                         <Link to="/"><Icon type="home"/>主页</Link>
